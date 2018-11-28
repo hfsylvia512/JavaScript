@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>闭包</title>
+	<style>
+		body{
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 12px;
+		}
+		h1{
+			font-size: 1.5em;
+		}
+		h2{
+			font-size: 1.2em;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		function init(){
+			var name = 'jerry';
+			function displayName(){
+				document.write(name+'<br>');
+			}
+			displayName();
+		}
+		init();
+// 下面例子与上面例子几乎相等
+		function makeFunc(){
+			var  name = 'some books';
+			function displayName(){
+				document.write(name+'<br>');
+			}
+			return displayName;
+		}
+		var myFunc = makeFunc();
+		myFunc();
+
+		// 实例三
+		function makeAdder(x){
+			return function(y){
+				return x +y;
+			}
+		}
+		var add5 = makeAdder(5);
+		var add10 = makeAdder(10);
+		document.write(add5(2)+'<br>');
+		document.write(add10(2)+'<br>');
+
+	</script>
+	 <p>Some paragraph text</p>
+    <h1>some heading 1 text</h1>
+    <h2>some heading 2 text</h2>
+
+    <a href="#" id="size-12">12</a>
+    <a href="#" id="size-14">14</a>
+    <a href="#" id="size-16">16</a>
+    <br>
+	<script>
+		function makeSize(size){
+			return function(){
+				document.body.style.fontSize = size + 'px';
+			}
+		}
+		var size12 = makeSize(12);
+		var size14 = makeSize(14);
+		var size16 = makeSize(16);
+		document.getElementById('size-12').onclick = size12;
+		document.getElementById('size-14').onclick = size14;
+		document.getElementById('size-16').onclick = size16;
+	</script>
+<!-- 用闭包模拟私有方法 -->
+	<!-- 模块模式 -->
+	<script>
+		var Counter = (function(){
+			var privateCounter = 0;
+			function changeBy(val){
+				privateCounter += val;
+			}
+			return {
+				increment: function(){
+					changeBy(1);
+				},
+				decrement: function(){
+					changeBy(-1);
+				},
+				value: function(){
+					return privateCounter;
+				}
+			}
+		})();
+		document.write(Counter.value());
+		Counter.increment();
+		Counter.increment();
+		document.write(Counter.value());
+		Counter.decrement();
+		document.write(Counter.value()+'<br>');
+
+
+		var makeCounter = function(){
+			var privateCounter = 0;
+			function changeBy(val){
+				privateCounter += val;
+			}
+			return {
+				increment1: function(){
+					changeBy(1);
+				},
+				decrement1: function(){
+					changeBy(-1);
+				},
+				value1: function(){
+					return privateCounter;
+				}
+			}
+		}
+		var Counter1 = makeCounter();
+		var Counter2 = makeCounter();
+		document.write(Counter1.value1());
+		Counter1.increment1();
+		Counter1.increment1();
+		document.write(Counter1.value1());
+		Counter1.decrement1();
+		document.write(Counter1.value1());
+		document.write(Counter2.value1());
+	</script>
+
+
+
+	<!-- 在循环中创建闭包：一个常见错误 -->
+	<p id="help">11Helpful notes will appear here</p>
+	<p>E-mail: <input type="text" id="email" name="email"></p>
+	<p>Name: <input type="text" id="name" name="name"></p>
+	<p>Age: <input type="text" id="age" name="age"></p>
+	
+	<script>
+		function showHelp(help){
+			document.getElementById('help').innerHTML = help;
+		}
+		function setupHelp(){
+			var helpText = [
+				{'id':'email','help':'Your e-mail address'},
+				{'id':'name','help':'Your full name'},
+				{'id':'age','help':'Your age (you must be over 16)'}
+			];
+			for(var i = 0; i<helpText.length; i++){
+				var item = helpText[i];
+				document.getElementById(item.id).onfocus =function(){
+					showHelp(item.help);
+				}
+			}
+		}
+		setupHelp();
+	</script>
+<!-- 上面例子把var改成let，因此每个闭包都绑定了块作用域的变量，这意味着不再需要额外的闭包 -->
+
+<p id="help3">22Helpful notes will appear here</p>
+	<p>E-mail: <input type="text" id="email3" name="email"></p>
+	<p>Name: <input type="text" id="name3" name="name"></p>
+	<p>Age: <input type="text" id="age3" name="age"></p>
+ 	<script>
+ 		function showHelp3(help){
+ 			document.getElementById('help3').innerHTML =help;
+ 		}
+ 		function setupHelp3(){
+ 			var helpText3 = [
+ 				{'id':'email3','help':'your e-mail address'},
+ 				{'id':'name3','help':'your full name'},
+ 				{
+ 					'id':'age3','help':'your age'
+ 				}
+ 			];
+ 			for(var i = 0; i<helpText3.length; i++){
+ 				let item3 = helpText3[i];
+ 				document.getElementById(item3.id).onfocus = function(){
+ 					showHelp3(item3.help);
+ 				}
+ 			}
+ 		}
+ 		setupHelp3();
+ 	</script>
+
+<!-- 另外一种解决方法-->
+<p id="help1">33Helpful notes will appear here</p>
+	<p>E-mail: <input type="text" id="email1" name="email"></p>
+	<p>Name: <input type="text" id="name1" name="name"></p>
+	<p>Age: <input type="text" id="age1" name="age"></p>
+	<script>
+		function showHelpPerfect(help){
+			document.getElementById('help1').innerHTML = help;
+		}
+		function makeHelpCallback(help){
+			return function () {
+				showHelpPerfect(help)
+			}
+		}
+		function setupHelpPerfect(){
+			var helpText1 = [
+				{'id':'email1','help':'Your e-mail address'},
+				{'id':'name1','help':'Your full name'},
+				{'id':'age1','help':'Your age (you must be over 16)'}
+			];
+			for(var i=0; i<helpText1.length; i++){
+				var items = helpText1[i];
+				document.getElementById(items.id).onfocus = makeHelpCallback(items.help);
+			}
+
+		}
+		setupHelpPerfect();
+	</script>
+
+
+	<!-- 另一种方法使用了匿名闭包 -->
+	<p id="help2">44Helpful notes will appear here</p>
+	<p>E-mail: <input type="text" id="email2" name="email"></p>
+	<p>Name: <input type="text" id="name2" name="name"></p>
+	<p>Age: <input type="text" id="age2" name="age"></p>
+	<script>
+		function showHelpC(help){
+			document.getElementById('help2').innerHTML = help;
+		}
+		function setupHelpC(){
+			var helpText2 =  [
+				{'id':'email2','help':'Your e-mail address'},
+				{'id':'name2','help':'Your full name'},
+				{'id':'age2','help':'Your age (you must be over 16)'}
+			];
+			for(var i = 0; i<helpText2.length; i++){
+				(function(){
+					var item2 = helpText2[i];
+					document.getElementById(item2.id).onfocus = function(){
+						showHelpC(item2.help);
+					}
+				})();//马上把当前循环的item2与事件回调相关联起来
+			}
+		}
+		setupHelpC();
+	</script>
+
+
+	<!-- 性能的考量 -->
+	<script>
+
+		function MyObject(name, message){
+			this.name = name.toString();
+			this.message = message.toString();
+			this.getName = function(){
+				return this.name;
+			}
+			this.getMessage = function(){
+				return this.message;
+			}
+		}
+		// 上面代码并没有利用到闭包的好处，可以修改如下
+		 function MyObject1(name, message){
+		 	this.name = name.toString();
+		 	this.message = message.toString();
+		 }
+		 MyObject1.prototype = {
+		 	getName: function(){
+		 		return this.name;
+		 	}
+		 	getMessage:function(){
+		 		return this.message;
+		 	}
+		 }
+
+		 // 但我们不建议从新定义原型。可改成如下例子
+		 function MyObject2(name, message){
+		 	this.name = name.toString();
+		 	this.message = message.toString();
+		 }
+		 MyObject2.prototype.getName = function(){
+		 	return this.name;
+		 }
+		 MyObject2.prototype.getMessage = function(){
+		 	return this.message;
+		 }
+
+	</script>
+</body>
+</html>
